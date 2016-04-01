@@ -1,0 +1,17 @@
+
+Update the destroy return values;
+Couchbase:
+  ☐ n1ql tutorial: http://query.pub.couchbase.com/tutorial/#1.
+  ☐ Cheat sheet: http://docs.couchbase.com/files/Couchbase-N1QL-CheatSheet.pdf
+  ☐ n1ql basics: http://developer.couchbase.com/documentation/server/4.0/getting-started/first-n1ql-query.html
+  ☐ NODE SDK: http://developer.couchbase.com/documentation/server/4.0/sdks/node-2.0/n1ql-queries.html
+  ☐ http://docs.couchbase.com/sdk-api/couchbase-node-client-2.0.1/N1qlQuery.html
+
+
+
+General:
+  ☐ flush es como el drop.
+
+
+Pendientes:
+ ☐ Error aleatorio en el create!;

@@ -1,0 +1,47 @@
+{
+  "name": "sails-cb",
+  "version": "0.10.0",
+  "description": "sails-cb adapter for Sails / Waterline",
+  "main": "sails-cb.js",
+  "scripts": {
+    "test": "node test/integration/runner -R spec -b",
+    "dtest": "node-debug test/integration/runner.js -R spec -b",
+    "utest": "mocha test/unit/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tomasruizr/sails-cb.git"
+  },
+  "keywords": [
+    "sails-cb",
+    "adapter",
+    "sails",
+    "waterline",
+    "sails.js",
+    "plugin"
+  ],
+  "author": "Tomás Ruiz <tomasruizr@gmail.com>",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "async": "^2.0.0-rc.2",
+    "couchbase": "^2.1.4",
+    "crypto": "0.0.3",
+    "lodash": "^4.6.1",
+    "uuid": "^2.0.1"
+  },
+  "devDependencies": {
+    "captains-log": "~0.11.0",
+    "chai": "^3.5.0",
+    "mocha": "*",
+    "sinon": "^1.17.3",
+    "waterline-adapter-tests": "~0.10.0"
+  },
+  "waterlineAdapter": {
+    "type": "sails-cb",
+    "interfaces": [
+      "queryable"
+    ],
+    "waterlineVersion": "~0.10.0"
+  }
+}
