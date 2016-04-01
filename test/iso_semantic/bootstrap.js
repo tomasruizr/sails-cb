@@ -2,9 +2,9 @@
 var Waterline = require('waterline');
 var _ = require('lodash');
 var async = require('async');
-require('./globals');
+require('../globals');
 
-var Adapter = require('../');
+var Adapter = require('../../');
 var TestRunner = require('waterline-adapter-tests');
 
 global.Semantic = {};

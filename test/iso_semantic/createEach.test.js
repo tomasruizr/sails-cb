@@ -4,7 +4,7 @@
  */
 var Adapter = require('../../');
 var waterline = require('waterline');
-var bootstrap = require('../bootstrap.js');
+var bootstrap = require('./bootstrap.js');
 var async = require('async');
   describe('.createEach()', function() {
     // before(function () {

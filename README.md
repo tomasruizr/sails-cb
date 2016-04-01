@@ -4,7 +4,22 @@
 
 Provides easy access to `Couchbase` from Sails.js & Waterline.
 
-This module is a Waterline/Sails adapter, an early implementation of a rapidly-developing, tool-agnostic data standard.  Its goal is to provide a set of declarative interfaces, conventions, and best-practices for integrating with all sorts of data sources.  Not just databases-- external APIs, proprietary web services, or even hardware.
+Is mostly based in the `N1QL` language to query the data and the SDK api to insert and update the documents.
+
+### Interfaces
+
+>`This adapter implements the [semantic]() interface. For now. Working on Queryable..`
+
+### Requirements
+
+**Couchbase Server CE 4.0.0-4051** or later.
+
+This adapter was developed and tested with **Couchbase Server CE 4.0.0-4051**
+
+It should work with the later versions althoug it's not tested... yet.
+
+Since the adapter makes an extensive use of `N1QL` I assume it won't work with prior versions.
+althou althoug it's not tested either.
 
 
 ### Installation
@@ -15,8 +30,55 @@ To install this adapter, run:
 $ npm install sails-cb
 ```
 
+### Configuration
 
+This are the defaults values for the attributes that can be specified when adding the connection to `config/connections.js`
 
+```js
+defaults: {
+      host: '127.0.0.1',
+      port: '8091',
+      username: '',
+      password: '',
+      bucket: 'default',
+      bucketPassword: '',
+      updateConcurrency: 'optimistic',
+      maxOptimisticRetries: 3,
+      persist_to: 1,
+      replicate_to: 0,
+      doNotReturn: false,
+      caseSensitive: false,
+      consistency: 1
+    }
+```
+
++ `host`: The address of the Couchbase server.
++ `port`: Port for the connection.
++ `username`: Username to connect to the Couchbase Server.
++ `password`: Password to connect to the Couchbase Server.
++ `bucket`: The Bucket to connect with.
++ `bucketPassword`: Password to connect to the bucket.
+
+The next attributes can be specified when specifying the connection for defaults, and can be overrided per transactions. Look at the `find`, `update`, `create`, `delete` methods for more info.
++ `updateConcurrency`: "optimistic" for optimistic transformations of Docs or anything else for pesimistic. 
++ `maxOptimisticRetries`: In case of optimistic concurrency, the amount of times it will try to update the docs before fail.
++ `persist_to`: The amount of servers to ensure persistance of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
++ `replicate_to`: The amount of servers to ensure replication of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
++ `doNotReturn`: Whether to return the result of a Insert, Update, Destroy operation or just a confirmation.
+  The default is false and every operation will return the full object. In case is true the methods will return:
+  + Insert: The `id` of the created Record or `error`.
+  + Update: empty if success or `error`.
+  + Destroy: empty if success or `error`.
++ `caseSensitive`: By Default all waterline queries are case-insensitive. This can be overrided for this adapter in the connection configuration or in a request basis. 
++ `consistency`: The Consistency level that should have de N1QL querys (select) in database: Must be one of the following integer Values:
+
+  **1**: NOT_BOUNDED: This is the default (for single-statement requests).
+  
+  **2**: REQUEST_PLUS: This implements strong consistency per request.
+  
+  **3**: STATEMENT_PLUS: This implements strong consistency per statement.
+
+**Please refer to the couchbase documentation for more information about the configuration**
 
 ### Usage
 
@@ -24,42 +86,57 @@ This adapter exposes the following methods:
 
 ###### `find()`
 
- NOT_BOUNDED number  1 
- This is the default (for single-statement requests).
-
- REQUEST_PLUS  number  2 
- This implements strong consistency per request.
-
- STATEMENT_PLUS  number  3 
- This implements strong consistency per statement.
-
 + **Status**
-  + Planned
+  + Tested for `Semantic` interface.
+
+  Special Attributes:
+  + when querying: `consistency`, `caseSensitive`.
+
+  + when getting by id: `expiry`, `format`
 
 ###### `create()`
 
 + **Status**
-  + Planned
+  + Tested for `Semantic` interface.
+
+  Special Attributes: `persist_to`, `replicate_to`
+
 
 ###### `update()`
 
 + **Status**
-  + Planned
+  + Tested for `Semantic` interface.
+
+  Special Attributes: 
+  + when update by quiery (with a where condition): `consistency`, `caseSensitive`  
+  
+  + when updating by id: `maxOptimisticRetries`, `cas`, `expiry`, `flags`, `format`, `persist_to`, `replicate_to`, `updateConcurrency`.
 
 ###### `destroy()`
 
 + **Status**
-  + Planned
+  + Tested for `Semantic` interface.
 
+  Special Attributes: 
+  + when deleting by query (with a where condition): `consistency`, `caseSensitive`
+  
+  + when deleting by id: `cas`, `persist_to`, `replicate_to`
 
+###### `query()`
 
-### Interfaces
++ **Status**
+  + Not Tested.
 
->`This adapter implements the [semantic]() interface. For now. Working on Queryable..`
+  Direct access to make N1QL queries. Its response is in the raw format provided by couchbase so you can configure the `returning` clause as you like.
+
+  Special Attributes: `consistency`.
+
 
 ### Running the tests
 
-Configure the interfaces you plan to support (and targeted version of Sails/Waterline) in the adapter's `package.json` file:
+You can run the integration tests provided by waterline just by runing `npm test` command.
+
+To tests the adapter specific tests run `mocha test/unit/*.js`
 
 ## Publish your adapter
 
