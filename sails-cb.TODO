@@ -1,8 +1,17 @@
 Test:
   ☐ doNotReturn
+  ☐ ARRAY_AGG aggregate function
 
 Pendientes:
   ☐ autoPK: use auto-increment atomic from couchbase, uuid, or custom.
+  ☐ id que no sean el id/ primary key definition
+
+  PrepareValue:
+     ☐ check associations.
+
+Waterline test suite:
+ ☐ If semantic is first and queryable goes second, throws an error.
+
 
 Couchbase:
   ☐ n1ql tutorial: http://query.pub.couchbase.com/tutorial/#1.

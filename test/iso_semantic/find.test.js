@@ -47,7 +47,6 @@ describe('.find()', function () {
 
   it('should return 1 record when searching for a specific record (integer test) with find', function (done) {
     Semantic.User.find({ age: 10 }, function (err, users) {
-      console.log(users);
       assert(!err);
       assert(Array.isArray(users));
       assert.strictEqual(users.length, 1);

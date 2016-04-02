@@ -30,13 +30,11 @@ var async = require('async');
         assert(!err);
         assert(Array.isArray(users));
         assert.strictEqual(users.length, 2);
-        console.log('llame al done');
         done();
       });
     });
 
     it('should insert 2 records verififed by find', function(done) {
-      console.log('hago la llamada');
       setTimeout(function() {
         Semantic.User.find({ type: 'createEach' }, function(err, users) {
           assert(!err);

@@ -94,6 +94,9 @@ This adapter exposes the following methods:
 
   + when getting by id: `expiry`, `format`
 
+  For the list of aggregate functions supported by the group by function refer to
+  [http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/aggregatefun.html](http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/aggregatefun.html)
+
 ###### `create()`
 
 + **Status**

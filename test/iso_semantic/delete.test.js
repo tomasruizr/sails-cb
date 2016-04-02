@@ -71,7 +71,6 @@ describe('.destroy()', function() {
     ////////////////////////////////////////////////////
 
     it('should destroy a record', function(done) {
-    	console.log(user.id);
       Semantic.User.destroy(user.id, function(err, status) {
         assert(!err);
         done();

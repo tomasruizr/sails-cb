@@ -17,6 +17,7 @@ module.exports = Waterline.Collection.extend({
     title: 'string',
     phone: 'string',
     type: 'string',
+    like: 'integer',
     favoriteFruit: {
       defaultsTo: 'blueberry',
       type: 'string'

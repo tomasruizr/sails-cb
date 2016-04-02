@@ -43,7 +43,6 @@ describe('inserts and query tests', function () {
 
     it('should insert a document', function (done) {
       bucket.insert('newID', { name: 'Tomas' }, function (err, res) {
-        console.log('despues del insert', err, res);
         assert(!err);
         done();
       });
@@ -54,7 +53,6 @@ describe('inserts and query tests', function () {
       var query = N1qlQuery.fromString('select * from default where name = "Tomas"').consistency(2);
       bucket.query(query, function (err, res) {
         assert(!err);
-        console.log('lo que viene del query', res);
         assert.equal(res[0].default.name, 'Tomas');
         done();
       });
@@ -81,7 +79,6 @@ describe('inserts and query tests', function () {
     it('should insert a document', function (done) {
       
       bucket.insert('newID', { name: 'Tomas' }, function (err, res) {
-        console.log('despues del insert', err, res);
         assert(!err);
         done();
       });
@@ -93,7 +90,6 @@ describe('inserts and query tests', function () {
       var query = N1qlQuery.fromString('select * from default where name = "Tomas"').consistency(2);
       bucket.query(query, function (err, res) {
         assert(!err);
-        console.log('lo que viene del query', res);
         assert.equal(res[0].default.name, 'Tomas');
         done();
       });
@@ -120,14 +116,12 @@ describe('inserts and query tests', function () {
     it('should insert a document', function (done) {
       
       bucket.insert('newID', { name: 'Tomas' }, function (err, res) {
-        console.log('despues del insert', err, res);
         assert(!err);
         var query = N1qlQuery.fromString('select * from default where name = "Tomas"').consistency(2);
         // var q = nquery('select * from default where name = "Tomas"');
 	      // q.consistency = 3;
 	      bucket.query(query, function (err, res) {
 	        assert(!err);
-	        console.log('lo que viene del query', res);
 	        assert.equal(res[0].default.name, 'Tomas');
 	        done();
 	      });
@@ -153,7 +147,6 @@ describe('inserts and query tests', function () {
     it('should insert a document', function (done) {      
     	async.times(10, function(n, next) {
 	      bucket.insert('newID' + n, { name: 'Tomas' }, function (err, res) {
-	        console.log('despues del insert', err, res);
 	        assert(!err);
 	        next();
 	      });
@@ -166,7 +159,6 @@ describe('inserts and query tests', function () {
       var query = N1qlQuery.fromString('select * from default where name = "Tomas"').consistency(2);
       bucket.query(query, function (err, res) {
         assert(!err);
-        console.log('lo que viene del query', res);
         assert.equal(res.length, 10);
         done();
       });

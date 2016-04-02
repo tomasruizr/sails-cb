@@ -28,6 +28,7 @@
     "couchbase": "^2.1.4",
     "crypto": "0.0.3",
     "lodash": "^4.6.1",
+    "moment": "^2.12.0",
     "uuid": "^2.0.1"
   },
   "devDependencies": {
@@ -40,7 +41,8 @@
   "waterlineAdapter": {
     "type": "sails-cb",
     "interfaces": [
-      "queryable"
+      "queryable",
+      "semantic"
     ],
     "waterlineVersion": "~0.10.0"
   }
