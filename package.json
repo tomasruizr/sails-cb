@@ -42,7 +42,9 @@
   "waterlineAdapter": {
     "type": "sails-cb",
     "interfaces": [
-      "associations"
+      "associations",
+      "queryable",
+      "semantic"
     ],
     "waterlineVersion": "~0.10.0"
   }
