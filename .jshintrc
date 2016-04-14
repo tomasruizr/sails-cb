@@ -23,6 +23,7 @@
     "before": true,
     "after": true,
     "afterEach": true,
-    "describe": true
+    "describe": true,
+    "debug": true
   }
 }

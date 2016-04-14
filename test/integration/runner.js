@@ -18,6 +18,7 @@ var mocha = require('mocha');
 var log = new (require('captains-log'))();
 var TestRunner = require('waterline-adapter-tests');
 var Adapter = require('../../');
+require('../debugHelper');
 
 
 
@@ -67,7 +68,10 @@ new TestRunner({
     // Default adapter config to use.
     config: {
         schema: false,
-        consistency:2
+        //Added to wait for all the n1ql response in order to pass the waterline integration tests.
+        consistency:2,
+        //Added to make adjusments for test time in order to pass the waterline integration tests.
+        testMode: true
     },
 
     // The set of adapter interfaces to test against.
