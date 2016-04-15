@@ -1,28 +1,12 @@
 ![image_squidhome@2x.png](http://i.imgur.com/RIvu9.png)
 
-TODO:// example with spetial attributes.
+//TODO: Update The links of the references.
 
 # sails-cb
 
 Provides easy access to `Couchbase` from Sails.js & Waterline.
 
 Is mostly based in the `N1QL` language to query the data and the SDK api to insert and update the documents.
-
-### Considerations
-
-+ This adapter is part of a specific software originally made to work with MySql and is now migrating to use Couchbase. So **it is not tested to fulfill all the Possible scenarios** but it may be a good place to start if you need to use Sails with Couchbase.
-
-+ Right now all the associations and joins are based in the `waterline-cursor` default implementation and **it is currently not taking all the possible advantage in the N1QL language** for the joins between the document types. This is very possible to implement and I'm sure will be a huge performance boost once it's ready. But for now, it was needed to work so the N1QL joins implementations will come later, I'm working on it.
-
-+ In the scenario I'm using to develop and test, all the **collections are in the same bucket**. In theory, it should work if more than one bucket is used to store data, but it is not tested it yet.
-
-+ **Cross Adapter operations** are not tested either, but once again, in theory they should work.
-
-+ Inside the bucket the stored **Documents are differentiated by Document Types from the Document Key (ID)**. In other words: All the keys are set to be something like `person::whatever-uuid-123456` for the table Person, and `product::whatever-uuid-123456` for table Product. If you would like to use something different than `uuid` to build your keys, take a look at the `create` function code to see where the keys are created.
-
-+ If you are not familiar with Couchbase, **read about it**, it is a very powerful tool it used wisely. [this](http://blog.couchbase.com/10-things-developers-should-know-about-couchbase) is a good place to start.
-
-+ There is still a lot of work and optimizations to do, feel free to **fork and make pull requests**, I will actively maintain this repository (depending on the time I have to do so, please be patient).
 
 ### Interfaces
 
@@ -34,9 +18,9 @@ For more information on interfaces please review the [waterline interfaces docum
 
 This adapter was developed and tested with **Couchbase Server CE 4.0.0-4051**
 
-It should work with the later versions although it's not tested... yet.
+It should work with the later versions and also with the Enterprise Edition, although it's not tested... yet.
 
-Since the adapter makes an extensive use of `N1QL` It is assumed that it won't work with prior versions. although it's not tested either.
+Since the adapter makes an extensive use of `N1QL` for Selects, Updates and Deletes, It is assumed that it won't work with prior versions or version that do not support N1QL v4~.
 
 
 ### Installation
@@ -74,7 +58,7 @@ defaults: {
 + `port`: Port for the connection.
 + `username`: Username to connect to the Couchbase Server.
 + `password`: Password to connect to the Couchbase Server.
-+ `bucket`: The Bucket to connect with.
++ `bucket`: The Name of the Bucket to connect with.
 + `bucketPassword`: Password to connect to the bucket.
 
 The next attributes can be specified when specifying the connection for defaults, and can be overridden per transactions. Look at the `find`, `update`, `create`, `delete` methods for more info and examples.
@@ -91,15 +75,25 @@ The next attributes can be specified when specifying the connection for defaults
 + `caseSensitive`: By Default all waterline queries are case-insensitive. This can be overridden for this adapter in the connection configuration or in a request basis. 
 + `consistency`: The Consistency level that should have de N1QL queries (select) in database: Must be one of the following integer Values:
 
-  **1**: NOT_BOUNDED: This is the default (for single-statement requests).
+  **1**: _NOT_BOUNDED_: This is the default (for single-statement requests).
   
-  **2**: REQUEST_PLUS: This implements strong consistency per request.
+  **2**: _REQUEST_PLUS_: This implements strong consistency per request.
   
-  **3**: STATEMENT_PLUS: This implements strong consistency per statement.
+  **3**: _STATEMENT_PLUS_: This implements strong consistency per statement.
 
 **Please refer to the couchbase documentation for more information about the configuration**
 
 ### Usage
+
+The methods exposed below accepts special attributes.
+The usage is to pass an object with the attributes you need as second parameter as long as any other waterline option.
+
+```js
+User.find({id: 'user::some-uuid-123456'}, {consistency:1, caseSensitive: true, testMode: false, limit: 5}, function (err, record) {
+  console.log(record); 
+}
+```
+Keep in mind that to use them you won't be able to use Dynamic Finders like findOne, or findById, findByName, etc, since those methods override the `options` parameter.
 
 This adapter exposes the following methods:
 
@@ -109,12 +103,11 @@ This adapter exposes the following methods:
   + Tested for `Semantic`, `Queryable` and `Association` interfaces.
 
   Special Attributes:
-  + when querying: `consistency`, `caseSensitive`, `testMode`.
 
+  + when querying: `consistency`, `caseSensitive`, `testMode`.
   + when getting by id: `expiry`, `format`
 
-  For the list of aggregate functions supported by the group by function refer to
-  [http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/aggregatefun.html](http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/aggregatefun.html)
+  >For the list of aggregate functions supported by the group by function refer [here](http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/aggregatefun.html).
 
 ###### `create()`
 
@@ -130,8 +123,8 @@ This adapter exposes the following methods:
   + Tested for `Semantic`, `Queryable` and `Association` interfaces.
 
   Special Attributes: 
+
   + when update by query (with a where condition): `consistency`, `caseSensitive`  
-  
   + when updating by id: `maxOptimisticRetries`, `cas`, `expiry`, `flags`, `format`, `persist_to`, `replicate_to`, `updateConcurrency`.
 
 ###### `destroy()`
@@ -140,8 +133,8 @@ This adapter exposes the following methods:
   + Tested for `Semantic`, `Queryable` and `Association` interfaces.
 
   Special Attributes: 
+
   + when deleting by query (with a where condition): `consistency`, `caseSensitive`
-  
   + when deleting by id: `cas`, `persist_to`, `replicate_to`
 
 ###### `query()`
@@ -160,26 +153,27 @@ You can run the integration tests provided by waterline just by running `npm tes
 
 To tests the adapter specific tests run `mocha test/unit/*.js`
 
-## Publish your adapter
+### Considerations
 
-> You're welcome to write proprietary adapters and use them any way you wish--
-> these instructions are for releasing an open-source adapter.
++ This adapter is part of a specific software originally made to work with MySql and is now migrating to use Couchbase. So **it is not tested to fulfill all the Possible scenarios** but it may be a good place to start if you need to use Sails with Couchbase.
 
-1. Create a [new public repo](https://github.com/new) and add it as a remote (`git remote add origin git@github.com:yourusername/sails-youradaptername.git)
-2. Make sure you attribute yourself as the author and set the license in the package.json to "MIT".
-3. Run the tests one last time.
-4. Do a [pull request to sails-docs](https://github.com/balderdashy/sails-docs/compare/) adding your repo to `data/adapters.js`.  Please let us know about any special instructions for usage/testing.
-5. We'll update the documentation with information about your new adapter
-6. Then everyone will adore you with lavish praises.  Mike might even send you jelly beans.
++ Right now all the associations and joins are based in the `waterline-cursor` default implementation and **it is currently not taking all the possible advantage in the N1QL language** for the joins between the document types. This is very possible to implement and I'm sure will be a huge performance boost once it's ready. But for now, it was needed to work so the N1QL joins implementations will come later, I'm working on it.
 
-7. Run `npm version patch`
-8. Run `git push && git push --tags`
-9. Run `npm publish`
++ You should configure a **separate connection for each bucket** you want to work with.
 
++ Inside the bucket the stored **Documents are differentiated by Document Types from the Document Key (ID)**. In other words: All the keys are set to be something like `person::whatever-uuid-123456` for the table Person, and `product::whatever-uuid-123456` for table Product. If you would like to use something different than `uuid` to build your keys, take a look at the `create` function code to see where the keys are created.
+
++ If you are not familiar with Couchbase, **read about it**, it is a very powerful tool it used wisely. [this](http://blog.couchbase.com/10-things-developers-should-know-about-couchbase) is a good place to start.
+
++ There is still a lot of work and optimizations to do, feel free to **fork and make pull requests**, I will actively maintain this repository (depending on the time I have to do so, please be patient).
 
 
 ### More Resources
 
+- [Couchbase Documentation](http://developer.couchbase.com/documentation/server/4.0/introduction/intro.html)
+- [Couchbase Node SDK](http://developer.couchbase.com/documentation/server/4.0/sdks/node-2.0/introduction.html)
+- [N1QL Tutorial](http://query.pub.couchbase.com/tutorial/#1)
+- [N1QL Reference](http://developer.couchbase.com/documentation/server/4.0/n1ql/index.html)
 - [Stackoverflow](http://stackoverflow.com/questions/tagged/sails.js)
 - [#sailsjs on Freenode](http://webchat.freenode.net/) (IRC channel)
 - [Twitter](https://twitter.com/sailsjs)
@@ -191,8 +185,7 @@ To tests the adapter specific tests run `mocha test/unit/*.js`
 ### License
 
 **[MIT](./LICENSE)**
-&copy; 2014 [balderdashy](http://github.com/balderdashy) & [contributors]
-[Mike McNeil](http://michaelmcneil.com), [Balderdash](http://balderdash.co) & contributors
+&copy; 2016 [Tomás Ruiz](mailto:tomasruizr@gmail.com).
 
 [Sails](http://sailsjs.org) is free and open-source under the [MIT License](http://sails.mit-license.org/).
 
