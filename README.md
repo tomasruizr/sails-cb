@@ -1,6 +1,8 @@
 ![image_squidhome@2x.png](http://i.imgur.com/RIvu9.png)
 
-# waterline-sails-cb
+TODO:// example with spetial attributes.
+
+# sails-cb
 
 Provides easy access to `Couchbase` from Sails.js & Waterline.
 
@@ -8,25 +10,27 @@ Is mostly based in the `N1QL` language to query the data and the SDK api to inse
 
 ### Considerations
 
-+ This adapter is part of a software originally made to work with MySql and is now migrating to use Couchbase.
++ This adapter is part of a specific software originally made to work with MySql and is now migrating to use Couchbase. So **it is not tested to fulfill all the Possible scenarios** but it may be a good place to start if you need to use Sails with Couchbase.
 
-+ Right now all the associations and joins are based in the `waterline-cursor` default implementation and it is not taking all the possible advantage in the N1QL language for the joins between the document types. This is very possible to implement and I'm sure will be a huge performance boost once it's ready. But for now, it was needed to work so the N1QL joins implementations will come later.
++ Right now all the associations and joins are based in the `waterline-cursor` default implementation and **it is currently not taking all the possible advantage in the N1QL language** for the joins between the document types. This is very possible to implement and I'm sure will be a huge performance boost once it's ready. But for now, it was needed to work so the N1QL joins implementations will come later, I'm working on it.
 
-+ In the scenario I'm using to develop and test, all the collections are in the same bucket. In theory, it should work if more than one bucket is used to store data, but it is not tested it yet.
++ In the scenario I'm using to develop and test, all the **collections are in the same bucket**. In theory, it should work if more than one bucket is used to store data, but it is not tested it yet.
 
-+ Cross Adapter operations are not tested either, but once again, in theory they should work.
++ **Cross Adapter operations** are not tested either, but once again, in theory they should work.
 
-+ There is still a lot of work and optimizations to do, feel free to fork and make pull requests, I will actively maintain this repository (depending on the time I have to do so, please be patient).
++ Inside the bucket the stored **Documents are differentiated by Document Types from the Document Key (ID)**. In other words: All the keys are set to be something like `person::whatever-uuid-123456` for the table Person, and `product::whatever-uuid-123456` for table Product. If you would like to use something different than `uuid` to build your keys, take a look at the `create` function code to see where the keys are created.
+
++ If you are not familiar with Couchbase, **read about it**, it is a very powerful tool it used wisely. [this](http://blog.couchbase.com/10-things-developers-should-know-about-couchbase) is a good place to start.
+
++ There is still a lot of work and optimizations to do, feel free to **fork and make pull requests**, I will actively maintain this repository (depending on the time I have to do so, please be patient).
 
 ### Interfaces
 
->`This adapter implements the semantic, queryable and the association interface.`
+This adapter implements the `semantic`, `queryable` and the `association` interfaces.
 For more information on interfaces please review the [waterline interfaces documentation](https://github.com/balderdashy/sails-docs/blob/master/contributing/adapter-specification.md).
 
 
 ### Requirements
-
-**Couchbase Server CE 4.0.0-4051** or later.
 
 This adapter was developed and tested with **Couchbase Server CE 4.0.0-4051**
 
@@ -73,7 +77,7 @@ defaults: {
 + `bucket`: The Bucket to connect with.
 + `bucketPassword`: Password to connect to the bucket.
 
-The next attributes can be specified when specifying the connection for defaults, and can be overridden per transactions. Look at the `find`, `update`, `create`, `delete` methods for more info.
+The next attributes can be specified when specifying the connection for defaults, and can be overridden per transactions. Look at the `find`, `update`, `create`, `delete` methods for more info and examples.
 + `updateConcurrency`: "optimistic" for optimistic transformations of Docs or anything else for pessimistic. 
 + `maxOptimisticRetries`: In case of optimistic concurrency, the amount of times it will try to update the docs before fail.
 + `persist_to`: The amount of servers to ensure persistence of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
