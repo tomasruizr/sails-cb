@@ -1,7 +1,5 @@
 ![image_squidhome@2x.png](http://i.imgur.com/RIvu9.png)
 
-//TODO: Update The links of the references.
-
 # sails-cb
 
 Provides easy access to `Couchbase` from Sails.js & Waterline.

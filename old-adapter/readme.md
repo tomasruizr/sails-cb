@@ -1,1 +1,0 @@
-This is a forlder of the adapter made by Casie Jones
