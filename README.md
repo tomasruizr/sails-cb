@@ -6,9 +6,23 @@ Provides easy access to `Couchbase` from Sails.js & Waterline.
 
 Is mostly based in the `N1QL` language to query the data and the SDK api to insert and update the documents.
 
+### Considerations
+
++ This adapter is part of a software originally made to work with MySql and is now migrating to use Couchbase.
+
++ Right now all the associations and joins are based in the `waterline-cursor` default implementation and it is not taking all the possible advantage in the N1QL language for the joins between the document types. This is very possible to implement and I'm sure will be a huge performance boost once it's ready. But for now, it was needed to work so the N1QL joins implementations will come later.
+
++ In the scenario I'm using to develop and test, all the collections are in the same bucket. In theory, it should work if more than one bucket is used to store data, but it is not tested it yet.
+
++ Cross Adapter operations are not tested either, but once again, in theory they should work.
+
++ There is still a lot of work and optimizations to do, feel free to fork and make pull requests, I will actively maintain this repository (depending on the time I have to do so, please be patient).
+
 ### Interfaces
 
->`This adapter implements the [semantic]() interface. For now. Working on Queryable..`
+>`This adapter implements the semantic, queryable and the association interface.`
+For more information on interfaces please review the [waterline interfaces documentation](https://github.com/balderdashy/sails-docs/blob/master/contributing/adapter-specification.md).
+
 
 ### Requirements
 
@@ -16,10 +30,9 @@ Is mostly based in the `N1QL` language to query the data and the SDK api to inse
 
 This adapter was developed and tested with **Couchbase Server CE 4.0.0-4051**
 
-It should work with the later versions althoug it's not tested... yet.
+It should work with the later versions although it's not tested... yet.
 
-Since the adapter makes an extensive use of `N1QL` I assume it won't work with prior versions.
-althou althoug it's not tested either.
+Since the adapter makes an extensive use of `N1QL` It is assumed that it won't work with prior versions. although it's not tested either.
 
 
 ### Installation
@@ -48,6 +61,7 @@ defaults: {
       replicate_to: 0,
       doNotReturn: false,
       caseSensitive: false,
+      testMode: false,
       consistency: 1
     }
 ```
@@ -59,18 +73,19 @@ defaults: {
 + `bucket`: The Bucket to connect with.
 + `bucketPassword`: Password to connect to the bucket.
 
-The next attributes can be specified when specifying the connection for defaults, and can be overrided per transactions. Look at the `find`, `update`, `create`, `delete` methods for more info.
-+ `updateConcurrency`: "optimistic" for optimistic transformations of Docs or anything else for pesimistic. 
+The next attributes can be specified when specifying the connection for defaults, and can be overridden per transactions. Look at the `find`, `update`, `create`, `delete` methods for more info.
++ `updateConcurrency`: "optimistic" for optimistic transformations of Docs or anything else for pessimistic. 
 + `maxOptimisticRetries`: In case of optimistic concurrency, the amount of times it will try to update the docs before fail.
-+ `persist_to`: The amount of servers to ensure persistance of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
++ `persist_to`: The amount of servers to ensure persistence of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
 + `replicate_to`: The amount of servers to ensure replication of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
++ `testMode`: It is used to always order the query results by Primary Key ASC if no other sorting criteria was specified. It is used to pass the waterline integration tests which is expecting that to happen. It's set to false by default and It is not encouraged to use in production environments and control the sorting options manually in a request basis.
 + `doNotReturn`: Whether to return the result of a Insert, Update, Destroy operation or just a confirmation.
   The default is false and every operation will return the full object. In case is true the methods will return:
   + Insert: The `id` of the created Record or `error`.
   + Update: empty if success or `error`.
   + Destroy: empty if success or `error`.
-+ `caseSensitive`: By Default all waterline queries are case-insensitive. This can be overrided for this adapter in the connection configuration or in a request basis. 
-+ `consistency`: The Consistency level that should have de N1QL querys (select) in database: Must be one of the following integer Values:
++ `caseSensitive`: By Default all waterline queries are case-insensitive. This can be overridden for this adapter in the connection configuration or in a request basis. 
++ `consistency`: The Consistency level that should have de N1QL queries (select) in database: Must be one of the following integer Values:
 
   **1**: NOT_BOUNDED: This is the default (for single-statement requests).
   
@@ -87,10 +102,10 @@ This adapter exposes the following methods:
 ###### `find()`
 
 + **Status**
-  + Tested for `Semantic` interface.
+  + Tested for `Semantic`, `Queryable` and `Association` interfaces.
 
   Special Attributes:
-  + when querying: `consistency`, `caseSensitive`.
+  + when querying: `consistency`, `caseSensitive`, `testMode`.
 
   + when getting by id: `expiry`, `format`
 
@@ -100,7 +115,7 @@ This adapter exposes the following methods:
 ###### `create()`
 
 + **Status**
-  + Tested for `Semantic` interface.
+  + Tested for `Semantic`, `Queryable` and `Association` interfaces.
 
   Special Attributes: `persist_to`, `replicate_to`
 
@@ -108,17 +123,17 @@ This adapter exposes the following methods:
 ###### `update()`
 
 + **Status**
-  + Tested for `Semantic` interface.
+  + Tested for `Semantic`, `Queryable` and `Association` interfaces.
 
   Special Attributes: 
-  + when update by quiery (with a where condition): `consistency`, `caseSensitive`  
+  + when update by query (with a where condition): `consistency`, `caseSensitive`  
   
   + when updating by id: `maxOptimisticRetries`, `cas`, `expiry`, `flags`, `format`, `persist_to`, `replicate_to`, `updateConcurrency`.
 
 ###### `destroy()`
 
 + **Status**
-  + Tested for `Semantic` interface.
+  + Tested for `Semantic`, `Queryable` and `Association` interfaces.
 
   Special Attributes: 
   + when deleting by query (with a where condition): `consistency`, `caseSensitive`
@@ -137,7 +152,7 @@ This adapter exposes the following methods:
 
 ### Running the tests
 
-You can run the integration tests provided by waterline just by runing `npm test` command.
+You can run the integration tests provided by waterline just by running `npm test` command.
 
 To tests the adapter specific tests run `mocha test/unit/*.js`
 
@@ -156,13 +171,6 @@ To tests the adapter specific tests run `mocha test/unit/*.js`
 7. Run `npm version patch`
 8. Run `git push && git push --tags`
 9. Run `npm publish`
-
-
-
-
-### Questions?
-
-See [`FAQ.md`](./FAQ.md).
 
 
 
