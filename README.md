@@ -70,6 +70,9 @@ The next attributes can be specified when specifying the connection for defaults
   + Insert: The `id` of the created Record or `error`.
   + Update: empty if success or `error`.
   + Destroy: empty if success or `error`.
+
+>Take into account that when `doNotReturn` is set to true, the default implementation of the sails **blueprints _WILL NOT_ work as expected**. In case you want to use it create your own blueprints implementation under the api folder in the sails project. For more info on how to do that go [here](http://stackoverflow.com/questions/22273789/crud-blueprint-overriding-in-sails-js). 
+
 + `caseSensitive`: By Default all waterline queries are case-insensitive. This can be overridden for this adapter in the connection configuration or in a request basis. 
 + `consistency`: The Consistency level that should have de N1QL queries (select) in database: Must be one of the following integer Values:
 
