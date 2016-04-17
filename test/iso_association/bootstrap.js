@@ -13,6 +13,7 @@ var TestRunner = require('waterline-adapter-tests');
 
 global.Associations = {};
 var conn = {
+      // schema:false,
       host: '127.0.0.1',
       port: '8091',
       username: '',
@@ -24,7 +25,8 @@ var conn = {
       lockTimeout: 15,
       adapter: 'wl_tests',
       consistency: 2,
-      testMode:true
+      testMode:true,
+      idStrategy: 'increment'
     };
 
 // Require Fixtures

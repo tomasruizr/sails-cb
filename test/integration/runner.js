@@ -69,9 +69,15 @@ new TestRunner({
     config: {
         schema: false,
         //Added to wait for all the n1ql response in order to pass the waterline integration tests.
+        //Check more about consistency in the Couchbase N1QL Documentation.
         consistency:2,
         //Added to make adjusments for test time in order to pass the waterline integration tests.
-        testMode: true
+        //Basically what is does is to force Order By Primary Key when no other criteria is present.
+        testMode: true,
+        //The Next one is Important to ensure the order by id works properly.
+        idStrategy: 'increment' // will work all the times. Recommended to perform waterline integration tests.
+        // idStrategy: 'uuid_v1' // will work almost all the time. (Once happened that it did not).
+        // idStrategy: 'uuid_v4' // will work some times
     },
 
     // The set of adapter interfaces to test against.

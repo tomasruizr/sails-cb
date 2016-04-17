@@ -35,6 +35,7 @@ var async = require('async');
 
       it('should work in a case insensitve fashion by default', function(done) {
         Queryable.User.findOne({where:{ first_name: 'theothertest', type: 'case sensitivity'}, sort:{age : 1}}, function(err, user) {
+          debug(user);
           assert(user.id);
           assert.equal(user.first_name, 'tHeOtherTest');
           assert.equal(toString.call(user.createdAt), '[object Date]');

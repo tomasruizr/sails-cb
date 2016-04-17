@@ -18,7 +18,7 @@ This adapter was developed and tested with **Couchbase Server CE 4.0.0-4051**
 
 It should work with the later versions and also with the Enterprise Edition, although it's not tested... yet.
 
-Since the adapter makes an extensive use of `N1QL` for Selects, Updates and Deletes, It is assumed that it won't work with prior versions or version that do not support N1QL v4~.
+Since the adapter makes an extensive use of `N1QL` for Selects, Updates and Deletes, It is assumed that it won't work with prior versions or version that do not support N1QL DP4~.
 
 
 ### Installation
@@ -48,24 +48,30 @@ defaults: {
       doNotReturn: false,
       caseSensitive: false,
       testMode: false,
-      consistency: 1
+      consistency: 1,
+      idStrategy: 'uuid_v1'
     }
 ```
 
-+ `host`: The address of the Couchbase server.
-+ `port`: Port for the connection.
-+ `username`: Username to connect to the Couchbase Server.
-+ `password`: Password to connect to the Couchbase Server.
-+ `bucket`: The Name of the Bucket to connect with.
-+ `bucketPassword`: Password to connect to the bucket.
++ `host`: `(String)` The address of the Couchbase server.
++ `port`: `(number)` Port for the connection.
++ `username`: `(String)`  Username to connect to the Couchbase Server.
++ `password`: `(String)`  Password to connect to the Couchbase Server.
++ `bucket`: `(String)`  The Name of the Bucket to connect with.
++ `bucketPassword`: `(String)`  Password to connect to the bucket.
++ `idStrategy`: `(String|function)` Defines the strategy to generate new ids for the documents: The possible values are:
+  + `uuid_v1` : Time Based
+  + `uuid_v4` : Random
+  + `increment` : Atomically created by the Couchbase `counter()` method. [read more](http://developer.couchbase.com/documentation/server/4.1/sdks/node-2.0/atomic-operations.html).
+  + `function(collection, bucket)`: Function that can be specified in the configuration of the connection by the user. Keep in mind that the generated key must match the regular expression `\w+::[^\s]+`. It's validated in the `normalizeResponse` method in `n1ql.js` file.
 
 The next attributes can be specified when specifying the connection for defaults, and can be overridden per transactions. Look at the `find`, `update`, `create`, `delete` methods for more info and examples.
-+ `updateConcurrency`: "optimistic" for optimistic transformations of Docs or anything else for pessimistic. 
-+ `maxOptimisticRetries`: In case of optimistic concurrency, the amount of times it will try to update the docs before fail.
-+ `persist_to`: The amount of servers to ensure persistence of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
-+ `replicate_to`: The amount of servers to ensure replication of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
-+ `testMode`: It is used to always order the query results by Primary Key ASC if no other sorting criteria was specified. It is used to pass the waterline integration tests which is expecting that to happen. It's set to false by default and It is not encouraged to use in production environments and control the sorting options manually in a request basis.
-+ `doNotReturn`: Whether to return the result of a Insert, Update, Destroy operation or just a confirmation.
++ `updateConcurrency`: `(String)` "optimistic" for optimistic transformations of Docs or anything else for pessimistic. 
++ `maxOptimisticRetries`: `(number)` In case of optimistic concurrency, the amount of times it will try to update the docs before fail.
++ `persist_to`: `(number)` The amount of servers to ensure persistence of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
++ `replicate_to`: `(number)` The amount of servers to ensure replication of the data before invoking the success callback for `create`, `update` and `delete` operations when working with sdk operations other than `N1QL`.
++ `testMode`: `(boolean)` It is used to always order the query results by Primary Key ASC if no other sorting criteria was specified. It is used to pass the waterline integration tests which is expecting that to happen. It's set to false by default and It is not encouraged to use in production environments and control the sorting options manually in a request basis.
++ `doNotReturn`: `(boolean)` Whether to return the result of a Insert, Update, Destroy operation or just a confirmation.
   The default is false and every operation will return the full object. In case is true the methods will return:
   + Insert: The `id` of the created Record or `error`.
   + Update: empty if success or `error`.
@@ -73,8 +79,8 @@ The next attributes can be specified when specifying the connection for defaults
 
 >Take into account that when `doNotReturn` is set to true, the default implementation of the sails **blueprints _WILL NOT_ work as expected**. In case you want to use it create your own blueprints implementation under the api folder in the sails project. For more info on how to do that go [here](http://stackoverflow.com/questions/22273789/crud-blueprint-overriding-in-sails-js). 
 
-+ `caseSensitive`: By Default all waterline queries are case-insensitive. This can be overridden for this adapter in the connection configuration or in a request basis. 
-+ `consistency`: The Consistency level that should have de N1QL queries (select) in database: Must be one of the following integer Values:
++ `caseSensitive`: `(boolean)` By Default all waterline queries are case-insensitive. This can be overridden for this adapter in the connection configuration or in a request basis. 
++ `consistency`: `(number)` The Consistency level that should have de N1QL queries (select) in database: Must be one of the following integer Values:
 
   **1**: _NOT_BOUNDED_: This is the default (for single-statement requests).
   
@@ -82,7 +88,7 @@ The next attributes can be specified when specifying the connection for defaults
   
   **3**: _STATEMENT_PLUS_: This implements strong consistency per statement.
 
-**Please refer to the couchbase documentation for more information about the configuration**
+**Please refer to the Couchbase documentation for more information about the Server configuration**
 
 ### Usage
 
@@ -152,7 +158,22 @@ This adapter exposes the following methods:
 
 You can run the integration tests provided by waterline just by running `npm test` command.
 
-To tests the adapter specific tests run `mocha test/unit/*.js`
+The configuration used to run the integration tests is:
+```js
+config: {
+    schema: false,
+    //Added to wait for all the n1ql response in order to pass the waterline integration tests.
+    //Check more about consistency in the Couchbase N1QL Documentation.
+    consistency:2,
+    //Added to make adjusments for test time in order to pass the waterline integration tests.
+    //Basically what is does is to force Order By Primary Key when no other criteria is present.
+    testMode: true,
+    //The Next one is Important to ensure the order by id works properly.
+    idStrategy: 'increment' // will work all the times. Recommended to perform waterline integration tests.
+    // idStrategy: 'uuid_v1' // will work almost all the time. (Once happened that it did not).
+    // idStrategy: 'uuid_v4' // will work some times
+},
+```
 
 ### Considerations
 
@@ -162,9 +183,9 @@ To tests the adapter specific tests run `mocha test/unit/*.js`
 
 + You should configure a **separate connection for each bucket** you want to work with.
 
-+ Inside the bucket the stored **Documents are differentiated by Document Types from the Document Key (ID)**. In other words: All the keys are set to be something like `person::whatever-uuid-123456` for the table Person, and `product::whatever-uuid-123456` for table Product. If you would like to use something different than `uuid` to build your keys, take a look at the `create` function code to see where the keys are created.
++ Inside the bucket the stored **Documents are differentiated by Document Types from the Document Key (ID)**. In other words: All the keys are set to be something like `person::whatever-uuid-123456` for the table Person, and `product::whatever-uuid-123456` for table Product. Check the `idStrategy` option in the configuration section for different options of unique Ids creation beside uuid.
 
-+ If you are not familiar with Couchbase, **read about it**, it is a very powerful tool it used wisely. [this](http://blog.couchbase.com/10-things-developers-should-know-about-couchbase) is a good place to start.
++ If you are not familiar with Couchbase, **read about it**, it is a very powerful tool it used wisely. [this](http://blog.couchbase.com/10-things-developers-should-know-about-couchbase) is a little bit outdated, but is a good place to start.
 
 + There is still a lot of work and optimizations to do, feel free to **fork and make pull requests**, I will actively maintain this repository (depending on the time I have to do so, please be patient).
 
