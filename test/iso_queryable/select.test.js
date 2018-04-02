@@ -45,6 +45,8 @@ describe('SELECT Query Modifier', function() {
 
     it('should return a record with a single field first_name', function(done) {
       Queryable.User.find({ where: { type: 'select test' }, select: ['first_name'], sort: 'age' }, function(err, users) {
+        console.log(err);
+        
         assert(!err);
         var user = users[0];
         assert.equal(user.first_name, 'select_user');

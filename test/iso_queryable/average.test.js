@@ -42,6 +42,8 @@ describe('AVERAGE Query Modifier', function() {
 
     it('should average by key and only return that key with the average value', function(done) {
       Queryable.User.find({ where:{type: 'average test'}, average: ['age'] }, function(err, averages) {
+        console.log(err, averages);
+        
         assert(!err,err);
         assert.strictEqual(averages[0].age, 4.5, 'expected averages[0].age to === 4.5, instead averages ==='+require('util').inspect(averages, false, null));
         done();

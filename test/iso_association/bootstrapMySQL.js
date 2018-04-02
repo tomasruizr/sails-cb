@@ -8,25 +8,26 @@ var _ = require('lodash');
 var async = require('async');
 require('../globals');
 
-var Adapter = require('../../');
+var Adapter = require('sails-mysql');
 var TestRunner = require('waterline-adapter-tests');
 
 global.Associations = {};
 var conn = {
       // schema:false,
       host: '127.0.0.1',
-      port: '8091',
-      username: 'test', //user in CB
+      port: '3306',
+      username: 'root', //user in CB
       password: '123456', //PW in CB
-      bucket: 'default',
-      bucketPassword: '',
-      updateConcurrency: 'optimistic',
-      maxOptimisticRetries: 3,
-      lockTimeout: 15,
+      database: 'associations',
+      // bucket: 'default',
+      // bucketPassword: '',
+      // updateConcurrency: 'optimistic',
+      // maxOptimisticRetries: 3,
+      // lockTimeout: 15,
       adapter: 'wl_tests',
-      consistency: 2,
-      testMode:true,
-      idStrategy: 'increment'
+      // consistency: 2,
+      // testMode:true,
+      // idStrategy: 'increment'
     };
 
 // Require Fixtures
@@ -70,18 +71,20 @@ before(function(done) {
 
   var connections = { associations: conn };
 
-  waterline.initialize({ adapters: { wl_tests: Adapter }, connections: connections }, function(err, _ontology) {
-    if(err) return done(err);
-
-    ontology = _ontology;
-
-    Object.keys(_ontology.collections).forEach(function(key) {
-      var globalName = key.charAt(0).toUpperCase() + key.slice(1);
-      global.Associations[globalName] = _ontology.collections[key];
+  Adapter.registerDatastore(conn, fixtures, () => {
+    waterline.initialize({ adapters: { wl_tests: Adapter }, connections: connections }, function(err, _ontology) {
+      if(err) return done(err);
+  
+      ontology = _ontology;
+  
+      Object.keys(_ontology.collections).forEach(function(key) {
+        var globalName = key.charAt(0).toUpperCase() + key.slice(1);
+        global.Associations[globalName] = _ontology.collections[key];
+      });
+  
+      done();
     });
-
-    done();
-  });
+  })
 });
 
 after(function(done) {

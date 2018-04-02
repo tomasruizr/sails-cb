@@ -61,8 +61,8 @@ var fixtures = {
 var conn = {
       host: '127.0.0.1',
       port: '8091',
-      username: '',
-      password: '',
+      username: 'test', //user in CB
+      password: '123456', //PW in CB
       bucket: 'default',
       bucketPassword: '',
       updateConcurrency: 'optimistic',

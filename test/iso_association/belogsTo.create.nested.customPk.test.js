@@ -12,7 +12,7 @@ describe('Belongs To Associations', function() {
       // TEST METHODS
       ////////////////////////////////////////////////////
 
-      it('should create a parent and child record and store the foreign key on the parent', function(done) {
+      it.only('should create a parent and child record and store the foreign key on the parent', function(done) {
         var data = {
           invoice: 1000,
           amount: 200,
@@ -34,7 +34,7 @@ describe('Belongs To Associations', function() {
           Associations.Paymentbelongscustom.findOne(payment.invoice)
           .populate('customer')
           .exec(function(err, _payment) {
-            debug(_payment);
+            console.log(JSON.stringify(_payment));
             assert(!err, err);
 
             // Test the parent is correct
